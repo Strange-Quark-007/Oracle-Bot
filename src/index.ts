@@ -97,12 +97,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
     const message = reaction?.message?.content || ''
     const author = reaction?.message?.author
+    const name = author?.bot ? author.username : author?.globalName || author?.username
     const translatedText = await translateText(message, 'auto', language)
     const translation = translatedText?.translation ?? 'error'
     const translatedTextEmbed = new EmbedBuilder()
-      .setAuthor({ name: author?.globalName || 'Author', iconURL: author?.displayAvatarURL() })
+      .setAuthor({ name: name || 'Author', iconURL: author?.displayAvatarURL() })
       .setDescription(translation)
-      .setFooter({ text: `Requested by ${user?.globalName}`, iconURL: user?.displayAvatarURL() })
+      .setFooter({ text: `Requested by ${user?.globalName || user?.username}`, iconURL: user?.displayAvatarURL() })
       .setColor('#ff00ff')
       .setTimestamp()
     ;(channel as TextChannel).send({ embeds: [translatedTextEmbed] })
