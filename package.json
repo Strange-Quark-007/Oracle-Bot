@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.cjs",
-    "build": "tsup src/**/*.ts --minify"
+    "build": "tsup src/ --minify"
   },
   "author": "Strange Quark",
   "description": "Custom Discord Bot",
