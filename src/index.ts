@@ -3,7 +3,17 @@ import { COMMANDS } from './constants/commands'
 import { EMOJI_MAP } from './constants/constants'
 import { translateText } from './translate/translate'
 import { logger } from './logger/logger'
-import { Client, GatewayIntentBits, REST, Routes, Partials, EmbedBuilder, TextChannel } from 'discord.js'
+import {
+  Client,
+  GatewayIntentBits,
+  ActivityType,
+  REST,
+  Routes,
+  Partials,
+  EmbedBuilder,
+  TextChannel,
+  PresenceUpdateStatus,
+} from 'discord.js'
 import {
   getFormattedScheduleDate,
   sendScheduledDate,
@@ -43,6 +53,16 @@ const rest = new REST({ version: '10' }).setToken(TOKEN)
 client.on('ready', () => {
   console.log(`Logged in as ${client?.user?.tag}!`)
   scheduleNextMessage(client, GUILD_ID, NOTIFICATION_CHANNEL_ID)
+  client.user?.setPresence({
+    activities: [
+      {
+        name: 'Oracle',
+        type: ActivityType.Watching,
+        state: '🔮 Translating your messages',
+      },
+    ],
+    status: PresenceUpdateStatus.Online,
+  })
 })
 
 client.on('interactionCreate', async (interaction) => {
@@ -109,6 +129,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
     ;(channel as TextChannel).send({ embeds: [translatedTextEmbed] })
   } catch (error) {
     logger(error)
+  }
+})
+
+client.on('messageCreate', (message) => {
+  if (message.author.bot) return
+
+  if (message.mentions.has(client?.user || '')) {
+    message.reply(
+      `Hello! 🔮 I’m Oracle, mystical translator & keeper of languages.\nReact with a country's flag on any message, and I’ll unveil its translation.`,
+    )
   }
 })
 
