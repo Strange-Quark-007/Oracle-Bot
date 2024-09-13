@@ -134,8 +134,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 client.on('messageCreate', (message) => {
   if (message.author.bot) return
-
-  if (message.mentions.has(client?.user || '')) {
+  if (message.content.includes('@here')) return
+  if (message.mentions.has(client?.user || '', { ignoreRoles: true, ignoreEveryone: true })) {
     message.reply(
       `Hello! 🔮 I’m Oracle, mystical translator & keeper of languages.\nReact with a country's flag on any message, and I’ll unveil its translation.`,
     )
