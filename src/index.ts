@@ -1,6 +1,6 @@
 import { envConfig, unnConfig } from './config'
 import { COMMANDS } from './constants/commands'
-import { EMOJI_MAP } from './constants/constants'
+import { EMOJI_MAP, LANGUAGE_CHOICES } from './constants/constants'
 import { translateText } from './translate/translate'
 import { logger } from './logger/logger'
 import {
@@ -31,10 +31,31 @@ const client = new Client({
 })
 const rest = new REST({ version: '10' }).setToken(TOKEN)
 
+let cachedLangListDesc = ''
+
+const LANGUAGE_LIST_DESC = () => {
+  if (cachedLangListDesc) {
+    return cachedLangListDesc
+  }
+  const list = Object.keys(LANGUAGE_CHOICES)
+  const group = 3
+  let description = '```'
+  for (let i = 0; i < Math.ceil(list.length / group); i++) {
+    for (let j = 0; j < group; j++) {
+      if (list[j + i * group]) {
+        description += list[j + i * group].padEnd(20, ' ')
+      }
+    }
+  }
+  description += '```'
+  cachedLangListDesc = description
+  return description
+}
+
 ;(async () => {
   try {
     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-      body: COMMANDS,
+      body: [COMMANDS.schedule, COMMANDS.stop, COMMANDS['reset-schedule'], COMMANDS['get-schedule-date']],
     })
   } catch (error) {
     console.error(error)
@@ -43,7 +64,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN)
 ;(async () => {
   try {
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [COMMANDS[0]],
+      body: [COMMANDS.ping, COMMANDS['list-languages'], COMMANDS.translate],
     })
   } catch (error) {
     console.error(error)
@@ -69,7 +90,6 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return
 
   const { commandName, guild, channel } = interaction
-  const COMMANDS_NAME_LIST = COMMANDS.map((command) => command.name)
 
   if (!guild || !channel) {
     await interaction.reply('Guild or channel information is missing.')
@@ -77,27 +97,66 @@ client.on('interactionCreate', async (interaction) => {
   }
 
   switch (commandName) {
-    case COMMANDS_NAME_LIST[0]:
+    case COMMANDS.ping.name:
       const latency = Date.now() - interaction.createdTimestamp
       await interaction.reply(`Pong! Latency is ${latency}ms.`)
       break
-    case COMMANDS_NAME_LIST[1]:
+    case COMMANDS.schedule.name:
       scheduleNextMessage(client, guild?.id, NOTIFICATION_CHANNEL_ID)
       await interaction.reply('Event Scheduled')
       sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID)
       break
-    case COMMANDS_NAME_LIST[2]:
+    case COMMANDS['get-schedule-date'].name:
       const messageEmbed = getFormattedScheduleDate(guild?.id, NOTIFICATION_CHANNEL_ID)
       await interaction.reply({ embeds: [messageEmbed] })
       break
-    case COMMANDS_NAME_LIST[3]:
+    case COMMANDS['reset-schedule'].name:
       resetSchedule(client, guild?.id, NOTIFICATION_CHANNEL_ID)
       await interaction.reply('The schedule has been reset.')
       sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID)
       break
-    case COMMANDS_NAME_LIST[4]:
+    case COMMANDS.stop.name:
       stopSchedule(guild?.id)
       await interaction.reply('The schedule has been stopped.')
+      break
+    case COMMANDS['list-languages'].name:
+      await interaction.deferReply()
+      const listEmbed = new EmbedBuilder()
+        .setAuthor({
+          name: client.user?.username || '',
+          iconURL: client.user?.displayAvatarURL(),
+        })
+        .setTitle('Languages supported')
+        .setDescription(LANGUAGE_LIST_DESC())
+        .setColor('#ff00ff')
+      await interaction.editReply({ embeds: [listEmbed] })
+      break
+    case COMMANDS.translate.name:
+      await interaction.deferReply()
+      const toOption = interaction.options.get('to')?.value?.toString() ?? ''
+      const toLang = LANGUAGE_CHOICES[toOption]
+      if (!toLang) {
+        await interaction.editReply(
+          'No such Language exists or language is not supported.\n Please verify complete language name or try other language',
+        )
+        return
+      }
+      const message = interaction.options.get('text')?.value?.toString() ?? ''
+      const translatedText = await translateText(message, 'auto', toLang)
+      const translation = translatedText?.translation ?? 'error'
+      const translateMessageEmbed = new EmbedBuilder()
+        .setAuthor({
+          name: interaction.client.user.username || 'Author',
+          iconURL: interaction.client.user.displayAvatarURL(),
+        })
+        .setDescription(translation)
+        .setColor('#ff00ff')
+        .setFooter({
+          text: `Requested by ${interaction.user.globalName}`,
+          iconURL: interaction.user.displayAvatarURL(),
+        })
+        .setTimestamp()
+      await interaction.editReply({ embeds: [translateMessageEmbed] })
       break
   }
 })
