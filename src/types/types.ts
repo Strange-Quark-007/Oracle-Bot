@@ -3,7 +3,7 @@ export interface EnvConfig {
   CLIENT_ID: string
 }
 
-export interface UNNConfig {
+export interface ServerConfig {
   GUILD_ID: string
   NOTIFICATION_CHANNEL_ID: string
 }

@@ -1,7 +1,7 @@
-import { envConfig, unnConfig } from './config'
+import { envConfig, serverConfig } from './config'
 import { COMMANDS } from './constants/commands'
 import { EMOJI_MAP, LANGUAGE_CHOICES } from './constants/constants'
-import { translateText } from './translate/translate'
+import { GET_LANGUAGE_LIST_DESC, translateText } from './translate/translate'
 import { logger } from './logger/logger'
 import {
   Client,
@@ -23,34 +23,13 @@ import {
 } from './scheduler/scheduler'
 
 const { TOKEN, CLIENT_ID } = envConfig
-const { GUILD_ID, NOTIFICATION_CHANNEL_ID } = unnConfig
+const { GUILD_ID, NOTIFICATION_CHANNEL_ID } = serverConfig
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 })
 const rest = new REST({ version: '10' }).setToken(TOKEN)
-
-let cachedLangListDesc = ''
-
-const LANGUAGE_LIST_DESC = () => {
-  if (cachedLangListDesc) {
-    return cachedLangListDesc
-  }
-  const list = Object.keys(LANGUAGE_CHOICES)
-  const group = 3
-  let description = '```'
-  for (let i = 0; i < Math.ceil(list.length / group); i++) {
-    for (let j = 0; j < group; j++) {
-      if (list[j + i * group]) {
-        description += list[j + i * group].padEnd(20, ' ')
-      }
-    }
-  }
-  description += '```'
-  cachedLangListDesc = description
-  return description
-}
 
 ;(async () => {
   try {
@@ -127,7 +106,7 @@ client.on('interactionCreate', async (interaction) => {
           iconURL: client.user?.displayAvatarURL(),
         })
         .setTitle('Languages supported')
-        .setDescription(LANGUAGE_LIST_DESC())
+        .setDescription(GET_LANGUAGE_LIST_DESC())
         .setColor('#ff00ff')
       await interaction.editReply({ embeds: [listEmbed] })
       break
