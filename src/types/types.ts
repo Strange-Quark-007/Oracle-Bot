@@ -21,3 +21,16 @@ export interface LanguageChoice {
 export interface EmojiMap {
   [key: string]: CountryInfo
 }
+
+export interface TranslationStats {
+  totalCharacters: number
+  totalWords: number
+  totalTranslations: number
+}
+
+export interface Stats {
+  totalCharacters: number
+  totalWords: number
+  totalTranslations: number
+  [day: string]: TranslationStats | number
+}
