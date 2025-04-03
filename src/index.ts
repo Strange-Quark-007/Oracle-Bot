@@ -1,3 +1,5 @@
+import express from 'express';
+import cors from 'cors';
 import {
   Client,
   GatewayIntentBits,
@@ -10,11 +12,13 @@ import {
   PresenceUpdateStatus,
 } from 'discord.js';
 
-import { envConfig, serverConfig } from './config';
+import { envConfig, serverConfig, TOTAL_STATS_FILE } from './config';
 import { COMMANDS } from './constants/commands';
 import { EMOJI_MAP, LANGUAGE_CHOICES } from './constants/constants';
 import { GET_LANGUAGE_LIST_DESC, translateText } from './translate/translate';
 import { logger } from './logger/logger';
+import statsRoute from './apis/statsRoute';
+import { readStats } from './stats/stats';
 import {
   getFormattedScheduleDate,
   sendScheduledDate,
@@ -35,7 +39,13 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
   try {
     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
-      body: [COMMANDS.schedule, COMMANDS.stop, COMMANDS['reset-schedule'], COMMANDS['get-schedule-date']],
+      body: [
+        COMMANDS.schedule,
+        COMMANDS.stop,
+        COMMANDS.stats,
+        COMMANDS['reset-schedule'],
+        COMMANDS['get-schedule-date'],
+      ],
     });
   } catch (error) {
     console.error(error);
@@ -45,10 +55,11 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 (async () => {
   try {
     await rest.put(Routes.applicationCommands(CLIENT_ID), {
-      body: [COMMANDS.ping, COMMANDS['list-languages'], COMMANDS.translate],
+      body: [COMMANDS.ping, COMMANDS.stats, COMMANDS['list-languages'], COMMANDS.translate],
     });
   } catch (error) {
     console.error(error);
+    logger(error);
   }
 })();
 
@@ -103,6 +114,34 @@ client.on('interactionCreate', async (interaction) => {
     case COMMANDS.stop.name:
       stopSchedule(guild?.id);
       await interaction.reply('The schedule has been stopped.');
+      break;
+
+    case COMMANDS.stats.name:
+      await interaction.deferReply();
+      const totalStats = readStats(TOTAL_STATS_FILE);
+
+      const statsEmbed = new EmbedBuilder()
+        .setAuthor({
+          name: client.user?.username || '',
+          iconURL: client.user?.displayAvatarURL(),
+        })
+        .setTitle('**🔮 Oracle Translation Stats**')
+        .setColor('#ff00ff')
+        .addFields(
+          { name: '', value: '' },
+          { name: '🔠 Characters', value: `**${totalStats.totalCharacters.toLocaleString()}**` },
+          { name: '', value: '' },
+          { name: '📝 Words', value: `**${totalStats.totalWords.toLocaleString()}**` },
+          { name: '', value: '' },
+          { name: '🌐 Translations', value: `**${totalStats.totalTranslations.toLocaleString()}**` },
+          { name: '', value: '' },
+        )
+        .setFooter({
+          text: `Requested by ${interaction.user.globalName}`,
+          iconURL: interaction.user.displayAvatarURL(),
+        })
+        .setTimestamp();
+      await interaction.editReply({ embeds: [statsEmbed] });
       break;
 
     case COMMANDS['list-languages'].name:
@@ -192,3 +231,14 @@ client.on('messageCreate', (message) => {
 });
 
 client.login(TOKEN);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use('/api/stats', statsRoute);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

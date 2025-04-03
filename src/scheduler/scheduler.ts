@@ -1,7 +1,8 @@
 import fs from 'fs';
 import cron from 'node-cron';
-import { logger } from '../logger/logger';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
+
+import { logger } from '../logger/logger';
 
 const SCHEDULE_FILE = './src/scheduler/schedule.json';
 let scheduledTask925PM: cron.ScheduledTask;

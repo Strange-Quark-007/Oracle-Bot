@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { Stats, TranslationStats } from '../types/types';
 
-const STATS_DIR = './statistics';
+import { Stats, TranslationStats } from '../types/types';
+import { STATS_DIR, TOTAL_STATS_FILE } from '../config';
 
 const initialStats = {
   totalCharacters: 0,
@@ -17,7 +17,7 @@ const getCurrentMonthFileName = () => {
   return path.join(STATS_DIR, `stats-${month}-${year}.json`);
 };
 
-const readStats = (file: string): Stats => {
+export const readStats = (file: string): Stats => {
   if (!fs.existsSync(STATS_DIR)) {
     fs.mkdirSync(STATS_DIR, { recursive: true });
   }
@@ -36,12 +36,13 @@ const writeStats = (file: string, stats: Stats) => {
 export const updateStats = (originalText: string): void => {
   const currentMonthFile = getCurrentMonthFileName();
   const currentStats = readStats(currentMonthFile);
+  const totalStats = readStats(TOTAL_STATS_FILE);
 
   const now = new Date();
   const day = String(now.getDate()).padStart(2, '0');
 
   const newCharactersCount = originalText.length;
-  const newWordsCount = originalText.split(' ').length;
+  const newWordsCount = originalText.split(/\s+/).length;
 
   currentStats.totalCharacters += newCharactersCount;
   currentStats.totalWords += newWordsCount;
@@ -56,4 +57,10 @@ export const updateStats = (originalText: string): void => {
   (currentStats[day] as TranslationStats).totalTranslations += 1;
 
   writeStats(currentMonthFile, currentStats);
+
+  totalStats.totalCharacters += newCharactersCount;
+  totalStats.totalWords += newWordsCount;
+  totalStats.totalTranslations += 1;
+
+  writeStats(TOTAL_STATS_FILE, totalStats);
 };

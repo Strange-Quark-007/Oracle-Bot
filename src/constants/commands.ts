@@ -25,6 +25,10 @@ export const COMMANDS = {
     name: 'list-languages',
     description: 'Lists the languages supported for `/translate` command',
   },
+  stats: {
+    name: 'stats',
+    description: 'Lists total translation stats',
+  },
   translate: {
     name: 'translate',
     description: 'Translates text to the language specified. Use `/list-languages` to get list of supported languages',
