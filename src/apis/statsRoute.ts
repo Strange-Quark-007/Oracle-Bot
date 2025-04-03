@@ -4,7 +4,7 @@ import { Stats } from '../types/types';
 import { TOTAL_STATS_FILE } from '../config';
 
 const router = express.Router();
-const EXPIRE_TIME = 0;
+const EXPIRE_TIME = 21600;
 
 const generateStatsSVG = (stats: Stats) => {
   return `
