@@ -1,4 +1,4 @@
-import { EmojiMap, LanguageChoice } from '../types/types'
+import { EmojiMap, LanguageChoice } from '../types/types';
 
 export const LANGUAGE_CHOICES: LanguageChoice = {
   Armenian: 'hy',
@@ -129,7 +129,7 @@ export const LANGUAGE_CHOICES: LanguageChoice = {
   Yoruba: 'yo',
   'Yucatec Maya': 'yua',
   Zulu: 'zu',
-}
+};
 
 export const EMOJI_MAP: EmojiMap = {
   '🇦🇫': {
@@ -1357,4 +1357,4 @@ export const EMOJI_MAP: EmojiMap = {
     name: 'Zimbabwe',
     langs: ['ny', 'en', 'xh', 've', 'tn', 'toi', 'st', 'sn', 'ts', 'nd', 'ndc', 'nmq', 'swk', 'hio'],
   },
-}
+};

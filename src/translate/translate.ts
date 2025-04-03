@@ -1,37 +1,37 @@
-import { translate } from 'bing-translate-api'
-import { logger } from '../logger/logger'
-import { updateStats } from '../stats/stats'
-import { LANGUAGE_CHOICES } from '../constants/constants'
+import { translate } from 'bing-translate-api';
+import { logger } from '../logger/logger';
+import { updateStats } from '../stats/stats';
+import { LANGUAGE_CHOICES } from '../constants/constants';
 
 export const translateText = async (text: string, from: string, to: string) => {
-  if (!text) return
-  if (!to) return
+  if (!text) return;
+  if (!to) return;
   try {
-    const response = await translate(`${text}`, null, to)
-    updateStats(text)
-    return response
+    const response = await translate(`${text}`, null, to);
+    updateStats(text);
+    return response;
   } catch (error) {
-    logger(error)
+    logger(error);
   }
-}
+};
 
 export const GET_LANGUAGE_LIST_DESC = (() => {
-  let cachedLangListDesc = ''
+  let cachedLangListDesc = '';
 
   return () => {
     if (cachedLangListDesc) {
-      return cachedLangListDesc
+      return cachedLangListDesc;
     }
 
-    const list = Object.keys(LANGUAGE_CHOICES)
-    let description = '```'
+    const list = Object.keys(LANGUAGE_CHOICES);
+    let description = '```';
 
     for (let i = 0; i < list.length; i++) {
-      description += list[i].padEnd(20, ' ')
+      description += list[i].padEnd(20, ' ');
     }
 
-    description += '```'
-    cachedLangListDesc = description
-    return description
-  }
-})()
+    description += '```';
+    cachedLangListDesc = description;
+    return description;
+  };
+})();
