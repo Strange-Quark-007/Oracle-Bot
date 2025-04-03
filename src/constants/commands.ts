@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord.js'
+import { ApplicationCommandOptionType } from 'discord.js';
 
 export const COMMANDS = {
   ping: {
@@ -43,4 +43,4 @@ export const COMMANDS = {
       },
     ],
   },
-}
+};
