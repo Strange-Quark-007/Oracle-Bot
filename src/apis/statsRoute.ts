@@ -37,7 +37,7 @@ const generateStatsSVG = (stats: Stats) => {
 
   <rect x="0.5" y="0.5" rx="4.5" height="99%" stroke="#e4e2e2" width="399" fill="#1f2430" stroke-opacity="1"/>
 
-  <g transform="translate(120, 30)" class="stagger" style="animation-delay: 300ms">
+  <g transform="translate(110, 30)" class="stagger" style="animation-delay: 300ms">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4cd7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 6V2H8"/>
       <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z"/>
@@ -49,7 +49,7 @@ const generateStatsSVG = (stats: Stats) => {
     <text x="30" y="14" class="header" >Oracle Bot Stats</text>
   </g>
 
-  <g transform="translate(120, 90)" class="stagger" style="animation-delay: 450ms">
+  <g transform="translate(110, 90)" class="stagger" style="animation-delay: 450ms">
     <svg x="-30" y="-15" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6abde6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sigma-icon lucide-sigma"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></svg>
     <text class="stat bold">
       Characters:
@@ -59,7 +59,7 @@ const generateStatsSVG = (stats: Stats) => {
     </text>
   </g>
 
-  <g transform="translate(120, 120)" class="stagger" style="animation-delay: 600ms">
+  <g transform="translate(110, 120)" class="stagger" style="animation-delay: 600ms">
     <svg x="-30" y="-15" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6abde6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-text-icon lucide-message-square-text"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/></svg>
     <text class="stat bold">
       Words:
@@ -69,7 +69,7 @@ const generateStatsSVG = (stats: Stats) => {
     </text>
   </g>
 
-  <g transform="translate(120, 150)" class="stagger" style="animation-delay: 750ms">
+  <g transform="translate(110, 150)" class="stagger" style="animation-delay: 750ms">
     <svg x="-30" y="-15" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6abde6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
     <text class="stat bold">
       Translations: 

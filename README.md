@@ -1,28 +1,36 @@
-# Oracle Bot
+# **Oracle Bot**
 
-A custom Discord bot built for a friend's server.
+A custom-built Discord bot designed for a friend, offering **custom event reminders, real-time translations, and now showcasing bot stats**.
 
-### What It Does
+## 🚀 **Bot Stats**
 
-- **Event Reminders**:
+Stay updated with **translation stats** using the **`/stats` command in Discord** or by viewing an **auto-updating SVG** for stats directly via the **REST API**.
 
-  - Sends an `@everyone` notifications at specified time (hard-coded) every alternate day for an event.
+<br/>
 
-- **Translation via Flag Reactions**:
+![Bot Stats](http://129.154.238.15:3000/api/stats)
 
-  - Translates text when users react with a country's flag emoji to the corresponding native language.
+## 🎯 **What It Does**
 
-- **Translation Commands**:
+### ⏰ **Event Reminders**
 
-  - Use `/translate to=<language> text=<message>` to translate text.
-  - Use `/list-languages` to show list of supported languages. (supports 100+)
+- Sends an **`@everyone` notification** at a specified time (hard-coded) every alternate day for event reminder.
 
-- **Schedule Controls**:
+### 🌍 **Translation via Flag Reactions**
 
-  - `/stop`: Stop event reminders.
-  - `/reset-schedule`: Reset the reminder schedule.
-  - `/get-schedule-date`: Sends the next schedule date.
+- **Translates text** when users react with a country's flag emoji to the corresponding native language.
 
-## **License**
+### 📝 **Translation Commands**
 
-This project is licensed under the [MIT License](LICENSE).
+- **`/translate to=<language> text=<message>`** - **Translates text** to the specified language.
+- **`/list-languages`** - **Shows a list** of supported languages (**100+**).
+
+### 🔧 **Schedule Controls**
+
+- **`/stop`** - **Stops event reminders.**
+- **`/reset-schedule`** - **Resets the reminder schedule.**
+- **`/get-schedule-date`** - **Sends the next schedule date.**
+
+## 📜 **License**
+
+This project is licensed under the **[MIT License](LICENSE)**.
