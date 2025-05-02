@@ -32,5 +32,6 @@ export interface Stats {
   totalCharacters: number;
   totalWords: number;
   totalTranslations: number;
+  totalReminders: number;
   [day: string]: TranslationStats | number;
 }

@@ -135,6 +135,8 @@ client.on('interactionCreate', async (interaction) => {
           { name: '', value: '' },
           { name: '🌐 Translations', value: `**${totalStats.totalTranslations.toLocaleString()}**` },
           { name: '', value: '' },
+          { name: '🔔 Reminders', value: `**${totalStats.totalReminders.toLocaleString()}**` },
+          { name: '', value: '' },
         )
         .setFooter({
           text: `Requested by ${interaction.user.globalName}`,
