@@ -8,6 +8,7 @@ const initialStats = {
   totalCharacters: 0,
   totalWords: 0,
   totalTranslations: 0,
+  totalReminders: 0,
 };
 
 const getCurrentMonthFileName = () => {
@@ -62,5 +63,11 @@ export const updateStats = (originalText: string): void => {
   totalStats.totalWords += newWordsCount;
   totalStats.totalTranslations += 1;
 
+  writeStats(TOTAL_STATS_FILE, totalStats);
+};
+
+export const updateReminders = () => {
+  const totalStats = readStats(TOTAL_STATS_FILE);
+  totalStats.totalReminders += 1;
   writeStats(TOTAL_STATS_FILE, totalStats);
 };
