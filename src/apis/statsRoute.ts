@@ -35,7 +35,7 @@ const generateStatsSVG = (stats: Stats) => {
     .bold { font-weight: 700 }
   </style>
 
-  <rect x="0.5" y="0.5" rx="4.5" height="100%" stroke="#e4e2e2" width="400" fill="#1f2430" stroke-opacity="1"/>
+  <rect x="0.5" y="0.5" rx="4.5" height="99%" stroke="#e4e2e2" width="399" fill="#1f2430" stroke-opacity="1"/>
 
   <g transform="translate(110, 30)" class="stagger" style="animation-delay: 300ms">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4cd7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
