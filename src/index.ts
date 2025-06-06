@@ -90,7 +90,7 @@ client.on('interactionCreate', async (interaction) => {
 
   switch (commandName) {
     case COMMANDS.ping.name:
-      const latency = Date.now() - interaction.createdTimestamp;
+      const latency = client.ws.ping;
       await interaction.reply(`Pong! Latency is ${latency}ms.`);
       break;
 
