@@ -11,24 +11,29 @@
   "author": "Strange Quark",
   "description": "Custom Discord Bot",
   "dependencies": {
-    "@discordjs/builders": "^1.8.2",
-    "@discordjs/rest": "^2.3.0",
+    "@discordjs/builders": "^1.11.2",
+    "@discordjs/rest": "^2.5.0",
     "bing-translate-api": "^4.0.2",
     "cors": "^2.8.5",
-    "discord.js": "^14.15.3",
-    "dotenv": "^16.4.5",
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "node-cron": "^3.0.3",
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
-    "@types/node": "^20.4.0",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^20.19.0",
     "@types/node-cron": "^3.0.11",
-    "ts-node": "^10.9.1",
-    "tsup": "^8.2.4",
-    "tsx": "^4.19.0",
-    "typescript": "^5.0.4"
+    "ts-node": "^10.9.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici@>=6.0.0 <6.21.2": ">=6.21.2"
+    }
   }
 }
