@@ -34,6 +34,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
@@ -63,9 +64,25 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
   }
 })();
 
+process.on('uncaughtException', (err) => {
+  logger({ UncaughtException: err });
+});
+
+process.on('unhandledRejection', (reason, p) => {
+  logger({ UnhandledRejection: reason });
+});
+
+client.on('error', (err) => {
+  logger({ DiscordClientError: err });
+});
+
 client.on('ready', () => {
   console.log(`Logged in as ${client?.user?.tag}!`);
-  scheduleNextMessage(client, GUILD_ID, NOTIFICATION_CHANNEL_ID);
+  try {
+    scheduleNextMessage(client, GUILD_ID, NOTIFICATION_CHANNEL_ID);
+  } catch (err) {
+    logger({ scheduleNextMessage: err });
+  }
   client.user?.setPresence({
     activities: [
       {
@@ -79,113 +96,117 @@ client.on('ready', () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+  try {
+    if (!interaction.isCommand()) return;
 
-  const { commandName, guild, channel } = interaction;
+    const { commandName, guild, channel } = interaction;
 
-  if (!guild || !channel) {
-    await interaction.reply('Guild or channel information is missing.');
-    return;
-  }
+    if (!guild || !channel) {
+      await interaction.reply('Guild or channel information is missing.');
+      return;
+    }
 
-  switch (commandName) {
-    case COMMANDS.ping.name:
-      const latency = client.ws.ping;
-      await interaction.reply(`Pong! Latency is ${latency}ms.`);
-      break;
+    switch (commandName) {
+      case COMMANDS.ping.name:
+        const latency = client.ws.ping;
+        await interaction.reply(`Pong! Latency is ${latency}ms.`);
+        break;
 
-    case COMMANDS.schedule.name:
-      scheduleNextMessage(client, guild?.id, NOTIFICATION_CHANNEL_ID);
-      await interaction.reply('Event Scheduled');
-      sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID);
-      break;
+      case COMMANDS.schedule.name:
+        scheduleNextMessage(client, guild?.id, NOTIFICATION_CHANNEL_ID);
+        await interaction.reply('Event Scheduled');
+        sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID);
+        break;
 
-    case COMMANDS['get-schedule-date'].name:
-      const messageEmbed = getFormattedScheduleDate(guild?.id, NOTIFICATION_CHANNEL_ID);
-      await interaction.reply({ embeds: [messageEmbed] });
-      break;
+      case COMMANDS['get-schedule-date'].name:
+        const messageEmbed = getFormattedScheduleDate(guild?.id, NOTIFICATION_CHANNEL_ID);
+        await interaction.reply({ embeds: [messageEmbed] });
+        break;
 
-    case COMMANDS['reset-schedule'].name:
-      resetSchedule(client, guild?.id, NOTIFICATION_CHANNEL_ID);
-      await interaction.reply('The schedule has been reset.');
-      sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID);
-      break;
+      case COMMANDS['reset-schedule'].name:
+        resetSchedule(client, guild?.id, NOTIFICATION_CHANNEL_ID);
+        await interaction.reply('The schedule has been reset.');
+        sendScheduledDate(client, guild?.id, channel?.id, NOTIFICATION_CHANNEL_ID);
+        break;
 
-    case COMMANDS.stop.name:
-      stopSchedule(guild?.id);
-      await interaction.reply('The schedule has been stopped.');
-      break;
+      case COMMANDS.stop.name:
+        stopSchedule(guild?.id);
+        await interaction.reply('The schedule has been stopped.');
+        break;
 
-    case COMMANDS.stats.name:
-      await interaction.deferReply();
-      const totalStats = readStats(TOTAL_STATS_FILE);
+      case COMMANDS.stats.name:
+        await interaction.deferReply();
+        const totalStats = readStats(TOTAL_STATS_FILE);
 
-      const statsEmbed = new EmbedBuilder()
-        .setAuthor({
-          name: client.user?.username || '',
-          iconURL: client.user?.displayAvatarURL(),
-        })
-        .setTitle('**🔮 Oracle Translation Stats**')
-        .setColor('#ff00ff')
-        .addFields(
-          { name: '', value: '' },
-          { name: '🔠 Characters', value: `**${totalStats.totalCharacters.toLocaleString()}**` },
-          { name: '', value: '' },
-          { name: '📝 Words', value: `**${totalStats.totalWords.toLocaleString()}**` },
-          { name: '', value: '' },
-          { name: '🌐 Translations', value: `**${totalStats.totalTranslations.toLocaleString()}**` },
-          { name: '', value: '' },
-          { name: '🔔 Reminders', value: `**${totalStats.totalReminders.toLocaleString()}**` },
-          { name: '', value: '' },
-        )
-        .setFooter({
-          text: `Requested by ${interaction.user.globalName}`,
-          iconURL: interaction.user.displayAvatarURL(),
-        })
-        .setTimestamp();
-      await interaction.editReply({ embeds: [statsEmbed] });
-      break;
+        const statsEmbed = new EmbedBuilder()
+          .setAuthor({
+            name: client.user?.username || '',
+            iconURL: client.user?.displayAvatarURL(),
+          })
+          .setTitle('**🔮 Oracle Translation Stats**')
+          .setColor('#ff00ff')
+          .addFields(
+            { name: '', value: '' },
+            { name: '🔠 Characters', value: `**${totalStats.totalCharacters.toLocaleString()}**` },
+            { name: '', value: '' },
+            { name: '📝 Words', value: `**${totalStats.totalWords.toLocaleString()}**` },
+            { name: '', value: '' },
+            { name: '🌐 Translations', value: `**${totalStats.totalTranslations.toLocaleString()}**` },
+            { name: '', value: '' },
+            { name: '🔔 Reminders', value: `**${totalStats.totalReminders.toLocaleString()}**` },
+            { name: '', value: '' },
+          )
+          .setFooter({
+            text: `Requested by ${interaction.user.globalName}`,
+            iconURL: interaction.user.displayAvatarURL(),
+          })
+          .setTimestamp();
+        await interaction.editReply({ embeds: [statsEmbed] });
+        break;
 
-    case COMMANDS['list-languages'].name:
-      await interaction.deferReply();
-      const listEmbed = new EmbedBuilder()
-        .setAuthor({
-          name: client.user?.username || '',
-          iconURL: client.user?.displayAvatarURL(),
-        })
-        .setTitle('Languages supported')
-        .setDescription(GET_LANGUAGE_LIST_DESC())
-        .setColor('#ff00ff');
-      await interaction.editReply({ embeds: [listEmbed] });
-      break;
+      case COMMANDS['list-languages'].name:
+        await interaction.deferReply();
+        const listEmbed = new EmbedBuilder()
+          .setAuthor({
+            name: client.user?.username || '',
+            iconURL: client.user?.displayAvatarURL(),
+          })
+          .setTitle('Languages supported')
+          .setDescription(GET_LANGUAGE_LIST_DESC())
+          .setColor('#ff00ff');
+        await interaction.editReply({ embeds: [listEmbed] });
+        break;
 
-    case COMMANDS.translate.name:
-      await interaction.deferReply();
-      const toOption = interaction.options.get('to')?.value?.toString() ?? '';
-      const toLang = LANGUAGE_CHOICES[toOption];
-      if (!toLang) {
-        await interaction.editReply(
-          'No such Language exists or language is not supported.\n Please verify complete language name or try other language',
-        );
-        return;
-      }
-      const message = interaction.options.get('text')?.value?.toString() ?? '';
-      const translatedText = await translateText(message, 'auto', toLang);
-      const translation = translatedText?.translation ?? 'error';
-      const translateMessageEmbed = new EmbedBuilder()
-        .setAuthor({
-          name: interaction.client.user.username || 'Author',
-          iconURL: interaction.client.user.displayAvatarURL(),
-        })
-        .setDescription(translation)
-        .setColor('#ff00ff')
-        .setFooter({
-          text: `Requested by ${interaction.user.globalName}`,
-          iconURL: interaction.user.displayAvatarURL(),
-        })
-        .setTimestamp();
-      await interaction.editReply({ embeds: [translateMessageEmbed] });
-      break;
+      case COMMANDS.translate.name:
+        await interaction.deferReply();
+        const toOption = interaction.options.get('to')?.value?.toString() ?? '';
+        const toLang = LANGUAGE_CHOICES[toOption];
+        if (!toLang) {
+          await interaction.editReply(
+            'No such Language exists or language is not supported.\n Please verify complete language name or try other language',
+          );
+          return;
+        }
+        const message = interaction.options.get('text')?.value?.toString() ?? '';
+        const translatedText = await translateText(message, 'auto', toLang);
+        const translation = translatedText?.translation ?? 'error';
+        const translateMessageEmbed = new EmbedBuilder()
+          .setAuthor({
+            name: interaction.client.user.username || 'Author',
+            iconURL: interaction.client.user.displayAvatarURL(),
+          })
+          .setDescription(translation)
+          .setColor('#ff00ff')
+          .setFooter({
+            text: `Requested by ${interaction.user.globalName}`,
+            iconURL: interaction.user.displayAvatarURL(),
+          })
+          .setTimestamp();
+        await interaction.editReply({ embeds: [translateMessageEmbed] });
+        break;
+    }
+  } catch (err) {
+    logger({ 'interactionCreate:': err });
   }
 });
 
